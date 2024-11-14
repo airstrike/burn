@@ -28,6 +28,7 @@ impl de::Error for DataframeDatasetError {
 ///
 /// This struct provides a way to access data from a Polars DataFrame
 /// as if it were a Dataset of type I.
+#[derive(Clone)]
 pub struct DataframeDataset<I> {
     df: DataFrame,
     len: usize,
@@ -405,6 +406,20 @@ mod tests {
                 binary: vec![7, 8, 9],
             }
         );
+    }
+
+    #[test]
+    fn test_dataframe_dataset_clone() {
+        let df = create_test_dataframe();
+        let dataset = DataframeDataset::<TestData>::new(df).unwrap();
+        let cloned_dataset = dataset.clone();
+
+        assert_eq!(dataset.len(), cloned_dataset.len());
+
+        let original_item = dataset.get(0).unwrap();
+        let cloned_item = cloned_dataset.get(0).unwrap();
+
+        assert_eq!(original_item, cloned_item);
     }
 
     #[test]
